@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clipper Pro</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>  
+    <div class="bg-overlay"></div>
+<div id="intro">
+  <div class="intro-content">
+    <div class="scissors">✂️</div>
+    <h1>AL KHATEEB</h1>
+    <p>Barber Shop System</p>
+  </div>
+</div>
+
+<div class="app">
+    <!-- Sidebar -->
+    <!-- Sidebar المطور والكامل لشاشات الصالون -->
+            <!-- 💡 القائمة الجانبية الموحدة والمثبتة هندسياً لمنع نزول الأزرار -->
+        <div class="sidebar">
+            <h2>Elktheeb Casher</h2>
+            <button onclick="goTo('index.html')">🏠 لوحة التحكم</button>
+            <button onclick="goTo('invoice.html')">➕ فاتورة جديدة</button>
+            <button onclick="goTo('history.html')">📜 سجل الفواتير</button>
+            <button onclick="goTo('reports.html')">📊 التقارير</button>
+            <button onclick="goTo('days.html')">📅 سجل الأيام</button>
+            <button onclick="goTo('expenses.html')">💸 المصاريف اليومية</button>
+            <button onclick="goTo('settings.html')">⚙️ الإعدادات</button>
+        </div>
+
+
+
+    <!-- Main -->
+    <div class="main">
+        <div class="topbar">
+            <h1>لوحة التحكم</h1>
+            <p id="date"></p>
+        </div>
+        <div class="cards">
+            <div class="card">
+                <h3>دخـل الـيـوم</h3>
+                <p id="todayTotal">0 جنيه</p>
+            </div>
+            <div class="card">
+                <h3>عـدد الـزبـائـن</h3>
+                <p id="todayCount">0</p>
+            </div>
+            <div class="card">
+                <h3>عـدد الـفـواتـيـر</h3>
+                <p id="invoiceCount">0</p>
+            </div>
+            <div class="card">
+                <h3>الـمـنـتـجـات الـمبـاعـة</h3>
+                <p id="productsCount">0</p>
+            </div>
+        </div>
+
+        <button class="new-btn" onclick="window.location.href='invoice.html'">
+            + فاتورة جديدة
+        </button>
+        
+        <!-- 💡 زرار الخصوصية البنفسجي الذكي بجانب فاتورة جديدة -->
+<button id="privacyBtn" class="new-btn" onclick="togglePrivacyMode()" style="background: linear-gradient(135deg, #a78bfa, #8b5cf6) !important; box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3) !important; margin-right: 10px;">
+  👁️ إظهار الأرقام
+</button>
+
+    </div>
+    
+</div>
+
+<script defer src="script.js"></script>
+<script>
+window.addEventListener("DOMContentLoaded", () => {
+    document.getElementById("date").innerText =
+    new Date().toLocaleDateString("ar-EG");
+});
+</script>
+</body>
+</html>

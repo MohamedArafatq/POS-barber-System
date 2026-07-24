@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>الإعدادات - الخطيب</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="bg-overlay"></div> <!-- 💡 تم إضافة طبقة التعتيم الفخمة هنا -->
+    <div class="app">
+
+              <!-- 💡 القائمة الجانبية الموحدة والمثبتة هندسياً لمنع نزول الأزرار -->
+        <div class="sidebar">
+            <h2>Elktheeb Casher</h2>
+            <button onclick="goTo('index.html')">🏠 لوحة التحكم</button>
+            <button onclick="goTo('invoice.html')">➕ فاتورة جديدة</button>
+            <button onclick="goTo('history.html')">📜 سجل الفواتير</button>
+            <button onclick="goTo('reports.html')">📊 التقارير</button>
+            <button onclick="goTo('days.html')">📅 سجل الأيام</button>
+            <button onclick="goTo('expenses.html')">💸 المصاريف اليومية</button>
+            <button onclick="goTo('settings.html')">⚙️ الإعدادات</button>
+        </div>
+
+
+
+
+
+
+        <!-- المحتوى الرئيسي المنظم -->
+        <div class="main">
+            <div class="topbar">
+                <button class="back-btn" onclick="goTo('index.html')">⬅</button>
+                <h1>⚙️ إعدادات الصالون والتحكم الحر</h1>
+                <p id="date"></p>
+            </div>
+
+            <!-- شبكة الإعدادات المنظمة في كروت جنب بعض -->
+            <div class="invoice-container">
+            <!-- 💡 كارت قفل وتصفير الوردية اليدوي الفخم بديل التوقيت التلقائي بطلبك بالملي -->
+<div class="invoice-section" style="background: rgba(220, 38, 38, 0.05) !important; border: 1px solid rgba(220, 38, 38, 0.18) !important; padding: 25px !important; border-radius: 18px !important; margin-bottom: 25px !important;">
+    <h2 style="color: #ef4444 !important; border-bottom: 1px solid rgba(220, 38, 38, 0.15) !important; padding-bottom: 10px !important; margin-bottom: 15px !important; font-size: 22px !important; font-weight: bold !important;">🔒 إغلاق وتصفير الوردية الحالية يدوياً</h2>
+    <div style="display: flex !important; justify-content: space-between !important; align-items: center !important; flex-wrap: wrap !important; gap: 15px !important; direction: rtl !important;">
+        <p style="margin: 0 !important; color: #cbd5e1 !important; font-size: 15px !important; font-weight: 500 !important;">اضغط على هذا الزرار عند الانتهاء من العمل تماماً بالصالون لتصفير عدادات لوحة التحكم بره لبدء وردية جديدة، مع بقاء الفواتير القديمة محفوظة في سجل الأيام للأبد.</p>
+        <button class="save-btn" onclick="triggerManualShiftReset()" style="margin: 0 !important; padding: 14px 35px !important; background: linear-gradient(135deg, #dc2626, #b91c1c) !important; box-shadow: 0 4px 15px rgba(220,38,38,0.3) !important; font-weight: bold !important; border-radius: 12px !important; cursor: pointer !important; color: white !important; border: none !important; transition: all 0.2s !important;">
+            🔒 قفل وتصفير الوردية الحين
+        </button>
+    </div>
+</div>
+
+
+                <!-- كروت إضافة الخدمات والمنتجات مصفوفة بالجنب -->
+                <div class="invoice-items-grid">
+                    <!-- عمود الخدمات -->
+                    <div class="invoice-section">
+                        <h2>➕ إضافة خدمة جديدة للمحل</h2>
+                        <div class="box" style="margin-bottom: 12px;">
+                            <label>اسم الخدمة</label>
+                            <input type="text" id="serviceName" placeholder="مثال: قَص شعر فخم" style="width: 100% !important;">
+                        </div>
+                        <div class="box" style="margin-bottom: 15px;">
+                            <label>السعر بالجنيه</label>
+                            <input type="number" id="servicePrice" placeholder="0 جنيه" style="width: 100% !important;">
+                        </div>
+                        <button class="save-btn" onclick="addService()" style="width: 100%; justify-content: center; background: linear-gradient(135deg, #059669, #10b981);">➕ إضافة الخدمة الحين</button>
+                        
+                        <h4 style="margin-top: 25px; margin-bottom: 8px; color: #94a3b8; font-size: 16px;">📜 قائمة الخدمات الحالية:</h4>
+                        <div id="servicesBox" class="items-list-container" style="max-height: 200px;"></div>
+                    </div>
+
+                    <!-- عمود المنتجات -->
+                    <div class="invoice-section">
+                        <h2>➕ إضافة منتج جديد للبيع</h2>
+                        <div class="box" style="margin-bottom: 12px;">
+                            <label>اسم المنتج</label>
+                            <input type="text" id="productName" placeholder="مثال: جيل / كريم حلاقة" style="width: 100% !important;">
+                        </div>
+                        <div class="box" style="margin-bottom: 15px;">
+                            <label>السعر بالجنيه</label>
+                            <input type="number" id="productPrice" placeholder="0 جنيه" style="width: 100% !important;">
+                        </div>
+                        <button class="save-btn" onclick="addProduct()" style="width: 100%; justify-content: center; background: linear-gradient(135deg, #059669, #10b981);">➕ إضافة المنتج الحين</button>
+                        
+                        <h4 style="margin-top: 25px; margin-bottom: 8px; color: #94a3b8; font-size: 16px;">📜 قائمة المنتجات الحالية:</h4>
+                        <div id="productsBox" class="items-list-container" style="max-height: 200px;"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script defer src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>المصاريف اليومية - الخطيب</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="bg-overlay"></div> <!-- 💡 تم إضافة طبقة التعتيم الفخمة هنا -->
+    <div class="app">
+        <!-- القائمة الجانبية المستقرة والمظبوطة -->
+              <!-- 💡 القائمة الجانبية الموحدة والمثبتة هندسياً لمنع نزول الأزرار -->
+        <div class="sidebar">
+            <h2>Elktheeb Casher</h2>
+            <button onclick="goTo('index.html')">🏠 لوحة التحكم</button>
+            <button onclick="goTo('invoice.html')">➕ فاتورة جديدة</button>
+            <button onclick="goTo('history.html')">📜 سجل الفواتير</button>
+            <button onclick="goTo('reports.html')">📊 التقارير</button>
+            <button onclick="goTo('days.html')">📅 سجل الأيام</button>
+            <button onclick="goTo('expenses.html')">💸 المصاريف اليومية</button>
+            <button onclick="goTo('settings.html')">⚙️ الإعدادات</button>
+        </div>
+
+
+        <!-- المحتوى الرئيسي المنظم للمصاريف -->
+        <div class="main">
+            <div class="topbar">
+                <button class="back-btn" onclick="goTo('index.html')">⬅</button>
+                <h1>💸 إدارة مصاريف الوردية اليومية</h1>
+                <p id="date"></p>
+            </div>
+
+            <div class="invoice-container">
+                <!-- كارت إضافة المصروف الجديد الحُر بالأعلى -->
+                <div class="invoice-section">
+                    <h2>📝 تسجيل مصروف يدوي جديد (يخصم من الدرج فوراً)</h2>
+                    <div class="inputs-grid" style="align-items: flex-end;">
+                        <div class="box">
+                            <label>بيان المصروف</label>
+                            <input type="text" id="quickExpName" placeholder="مثال: شاي / سكر / سوبرماركت">
+                        </div>
+                        <div class="box">
+                            <label>المبلغ المدفوع</label>
+                            <input type="number" id="quickExpAmount" placeholder="0 جنيه">
+                        </div>
+                        <button class="save-btn" onclick="saveQuickExpense()" style="margin: 0; padding: 13px 30px; background: linear-gradient(135deg, #ef4444, #dc2626); box-shadow: 0 4px 15px rgba(239,68,68,0.3);">
+                            💸 تسجيل خصم المصروف
+                        </button>
+                    </div>
+                </div>
+
+                <!-- كارت لوج وعرض مصاريف اليوم ومجموعها -->
+                <div class="invoice-section" style="margin-top: 15px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 10px; margin-bottom: 15px;">
+                        <h2 style="margin: 0; border: none; padding: 0;">📋 قائمة مصاريف الوردية الحالية</h2>
+                        <div style="font-size: 18px; font-weight: bold; color: #f87171;">
+                            إجمالي فواتير المصاريف اليوم: <span id="todayExpensesSum" style="font-size: 24px; font-weight: 800;">0</span> جنيه
+                        </div>
+                    </div>
+                    <!-- هنا بتنزل المصاريف المسجلة أوتوماتيك بتفاصيل الوقت وحركة الـ X للحذف -->
+                    <div id="expensesLogBox" class="items-list-container" style="max-height: 350px;"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script defer src="script.js"></script>
+</body>
+</html>

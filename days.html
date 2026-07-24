@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="ar">  
+<head>
+
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>الأيام السابقة</title>
+  <link rel="stylesheet" href="style.css">
+
+</head>
+
+<body>
+  <div class="bg-overlay"></div> <!-- طبقة التعتيم والبلور الفخمة -->
+  <div class="app">
+
+    <!-- 💡 القائمة الجانبية الموحدة والمثبتة هندسياً لمنع لخبطة وحركة الأزرار -->
+    <div class="sidebar">
+        <h2>Elktheeb Casher</h2>
+        <button onclick="goTo('index.html')">🏠 لوحة التحكم</button>
+        <button onclick="goTo('invoice.html')">➕ فاتورة جديدة</button>
+        <button onclick="goTo('history.html')">📜 سجل الفواتير</button>
+        <button onclick="goTo('reports.html')">📊 التقارير</button>
+        <button onclick="goTo('days.html')">📅 سجل الأيام</button>
+        <button onclick="goTo('expenses.html')">💸 المصاريف اليومية</button>
+        <button onclick="goTo('settings.html')">⚙️ الإعدادات</button>
+    </div>
+
+    <!-- المحتوى الرئيسي للأيام مصفوف بالمسطرة بجانب السايدبار -->
+    <div class="main">
+      <div class="topbar">
+        <button id="backBtn" class="back-btn" onclick="handleBackAction()">⬅</button>
+        <h1>📅 أرشـيـف الأيـام والـورديـات الـسـابـقـة</h1>
+        <p id="date"></p>
+      </div>
+
+      <div class="invoice-container" style="max-width: 1100px;">
+        <div class="invoice-section">
+          <h2 style="font-size: 22px; color: #60a5fa; border: none; padding: 0; margin: 0;">🗄️ اختر اليوم لعرض تفاصيل الوردية المقفلة بالقرش</h2>
+        </div>
+        
+        <!-- شبكة عرض الأيام السابقة -->
+        <div id="daysGridLayout" class="invoices-grid-layout"></div>
+
+        <!-- قسم تفاصيل اليوم المحدد (يظهر ديناميكياً عند الضغط على أي يوم) -->
+        <div id="dayDetailsSection" class="invoice-section" style="display: none; margin-top: 40px;">
+          <h2 id="detailsTitle">📊 تفاصيل الوردية</h2>
+          <div class="reports-grid-layout" style="margin-top: 15px;">
+            <div class="reports-card card-today">
+              <h3>إجمالي دخل اليوم</h3>
+              <p id="dTotal">0 جنيه</p>
+            </div>
+            <div class="reports-card card-today" style="border-color: rgba(52, 211, 153, 0.4);">
+              <h3>💵 الكاش في الدرج</h3>
+              <p id="dCash" style="color: #34d399;">0 جنيه</p>
+            </div>
+            <div class="reports-card card-today" style="border-color: rgba(167, 139, 250, 0.4);">
+              <h3>📱 المحفظة والتحويلات</h3>
+              <p id="dElectronic" style="color: #a78bfa;">0 جنيه</p>
+            </div>
+          </div>
+
+          <h3 style="margin-top: 30px; color: #60a5fa; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 8px;">💈 إنتاجية الحلاقين في هذا اليوم:</h3>
+          <div class="reports-grid-layout">
+            <div class="reports-card card-week">
+              <h3>دخل محمود</h3>
+              <p id="dMahmoud">0 جنيه</p>
+            </div>
+            <div class="reports-card card-week">
+              <h3>دخل محمد</h3>
+              <p id="dMohamed">0 جنيه</p>
+            </div>
+            <div class="reports-card card-week">
+              <h3>دخل عرفه</h3>
+              <p id="dArafa">0 جنيه</p>
+            </div>
+          </div>
+
+          <!-- 💡 سطر الزرار المطور والمتسنتر في المنتصف بالأسفل منعاً للعشوائية -->
+          <div style="display: flex; justify-content: center; width: 100%; margin-top: 35px; margin-bottom: 10px;">
+              <button id="viewDayInvoicesBtn" class="new-btn" style="margin: 0; padding: 14px 35px; font-size: 16px; font-weight: bold; background: linear-gradient(135deg, #2563eb, #3b82f6); border-radius: 12px; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; box-shadow: 0 4px 15px rgba(37,99,235,0.3);">
+                  👁️ عرض فواتير هذه الوردية بالكامل
+              </button>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>

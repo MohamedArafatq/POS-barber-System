@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>الـتقـاريـر</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+  <div class="bg-overlay"></div> <!-- طبقة التعتيم والبلور الفخمة -->
+  <div class="app">
+
+    <!-- 💡 القائمة الجانبية الموحدة والمثبتة هندسياً لمنع لخبطة وحركة الأزرار -->
+    <div class="sidebar">
+        <h2>Elktheeb Casher</h2>
+        <button onclick="goTo('index.html')">🏠 لوحة التحكم</button>
+        <button onclick="goTo('invoice.html')">➕ فاتورة جديدة</button>
+        <button onclick="goTo('history.html')">📜 سجل الفواتير</button>
+        <button onclick="goTo('reports.html')">📊 التقارير</button>
+        <button onclick="goTo('days.html')">📅 سجل الأيام</button>
+        <button onclick="goTo('expenses.html')">💸 المصاريف اليومية</button>
+        <button onclick="goTo('settings.html')">⚙️ الإعدادات</button>
+    </div>
+
+    <!-- المحتوى الرئيسي للتقارير مصفوف بالمسطرة بجانب السايدبار -->
+    <div class="main">
+      <div class="topbar">
+        <button class="back-btn" onclick="goTo('index.html')">⬅</button>
+        <h1>📊 الـتـقـاريـر الإحـصـائـيـة</h1>
+        <p id="date"></p>
+      </div>
+
+      <div class="invoice-container" style="max-width: 1100px;">
+        <div class="invoice-section">
+          <h2 style="font-size: 22px; color: #60a5fa; border: none; padding: 0; margin: 0;">📊 ملخص حركة الدخل والمبيعات للوردية</h2>
+        </div>
+        
+        <!-- شبكة عرض التقارير المتناسقة المحدثة بالكامل -->
+        <div class="reports-grid-layout">
+          <div class="reports-card card-today">
+            <h3>دخـل الـيـوم الإجمالي</h3>
+            <p id="today">0 جنيه</p>
+          </div>
+
+          <!-- 💵 كارت فرز الكاش للدرج -->
+          <div class="reports-card card-today" style="border-color: rgba(52, 211, 153, 0.4);">
+            <h3>💵 الـكـاش فـي الـدرج (الـيـوم)</h3>
+            <p id="cashTotal" style="color: #34d399;">0 جنيه</p>
+          </div>
+
+          <!-- 📱 كارت فرز المحفظة الإلكترونية والمعاملات الرقمية -->
+          <div class="reports-card card-today" style="border-color: rgba(167, 139, 250, 0.4);">
+            <h3>📱 الـمـحـفـظـة والـتـحـويـلات (الـيـوم)</h3>
+            <p id="electronicTotal" style="color: #a78bfa;">0 جنيه</p>
+          </div>
+
+          <div class="reports-card card-week">
+            <h3>دخـل الأسـبـوع</h3>
+            <p id="week">0 جنيه</p>
+          </div>
+
+          <div class="reports-card card-month">
+            <h3>دخـل الـشـهـر</h3>
+            <p id="month">0 جنيه</p>
+          </div>
+
+          <div class="reports-card card-all">
+            <h3>إجـمـالـي الـفـواتـيـر الكلي</h3>
+            <p id="all">0 جنيه</p>
+          </div>
+        </div>
+
+        <!-- إحصائيات ودخل الحلاقين أوتوماتيك -->
+        <div class="invoice-section" style="margin-top: 40px;">
+          <h2 style="font-size: 22px; color: #e2e8f0; border: none; padding: 0; margin: 0;">💈 دخـل الـحـلاقـيـن (الـيـوم)</h2>
+        </div>
+        
+        <div class="reports-grid-layout">
+          <div class="reports-card card-week">
+            <h3>دخل محمود</h3>
+            <p id="barberMahmoud">0 جنيه</p>
+          </div>
+
+          <div class="reports-card card-week">
+            <h3>دخل محمد</h3>
+            <p id="barberMohamed">0 جنيه</p>
+          </div>
+
+          <div class="reports-card card-week">
+            <h3>دخل عرفه</h3>
+            <p id="barberArafa">0 جنيه</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <script defer src="script.js"></script>
+</body>
+</html>

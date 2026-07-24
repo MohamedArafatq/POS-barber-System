@@ -1,0 +1,1097 @@
+
+/* ==========================================================================
+   1. INTRO SCREEN (الشاشة الترحيبية المحسنة)
+   ========================================================================== */
+   
+#intro {
+  position: fixed;
+  inset: 0;
+  background: radial-gradient(circle at center, #111827, #0f172a);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+  opacity: 1;
+  transition: opacity 0.8s cubic-bezier(0.4, 0, 0.2, 1), transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+#intro.hide {
+  opacity: 0;
+  transform: scale(1.05);
+}
+
+.intro-content {
+  text-align: center;
+  animation: fadeInScale 1.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* حركة مقص حقيقية ديناميكية وتقص بشكل مستمر */
+.scissors {
+  font-size: 60px;
+  margin-bottom: 15px;
+  display: inline-block;
+  animation: scissorsCut 0.8s ease-in-out infinite, floatApp 2.5s ease-in-out infinite;
+}
+
+.intro-content h1 {
+  font-size: 52px;
+  letter-spacing: 4px;
+  color: white;
+  text-shadow: 0 0 15px rgba(96,165,250,0.8), 0 0 30px rgba(96,165,250,0.4);
+  animation: glowEffect 2s infinite alternate;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.intro-content p {
+  color: #60a5fa;
+  letter-spacing: 3px;
+  margin-top: 10px;
+  font-weight: 500;
+}
+
+/* ==========================================================================
+   2. BODY & GENERAL LAYOUT (الهيكل العام والتعتيم الزجاجي والـ Overlay)
+   ========================================================================== */
+body {
+  margin: 0;
+  font-family: 'Segoe UI', Arial, sans-serif;
+  background-image: url("barbar.png") !important; 
+  background-position: center center !important; 
+  background-repeat: no-repeat !important;       
+  background-size: 100% 100% !important;         
+  background-attachment: fixed !important;         
+  color: white;
+  overflow: hidden;
+}
+
+.bg-overlay {
+  position: fixed;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(15, 23, 42, 0.8), rgba(8, 11, 20, 0.85)) !important;
+  backdrop-filter: blur(8px) cubic-bezier(0.4, 0, 0.2, 1); 
+  -webkit-backdrop-filter: blur(8px);
+  z-index: 0; 
+}
+
+.app {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  height: 100vh;
+}
+
+.main, .page, .history, .invoice, .settings, .reports {
+  animation: pageEnterActive 0.5s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+}
+
+/* ==========================================================================
+   3. SIDEBAR (القائمة الجانبية المودرن)
+   ========================================================================== */
+.sidebar {
+  width: 300px;
+  background: rgba(17, 24, 39, 0.6);
+  backdrop-filter: blur(15px);
+  -webkit-backdrop-filter: blur(15px);
+  padding: 30px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  border-right: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 5px 0 25px rgba(0, 0, 0, 0.3);
+}
+
+.sidebar h2 {
+  margin-bottom: 25px;
+  color: #60a5fa;
+  font-size: 26px;
+  text-align: center;
+  font-weight: 700;
+  letter-spacing: 1px;
+}
+
+.sidebar button {
+  background: rgba(255, 255, 255, 0.03);
+  font-size: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  color: white;
+  padding: 14px;
+  border-radius: 12px;
+  cursor: pointer;
+  text-align: right;
+  direction: rtl;
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+.sidebar button:hover {
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.2), rgba(96, 165, 250, 0.1));
+  border-color: rgba(96, 165, 250, 0.4);
+  transform: translateX(-5px);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+.sidebar button:active {
+  transform: scale(0.98) translateX(-2px);
+}
+
+
+/* ==========================================================================
+   4. DASHBOARD & TOPBAR (لوحة التحكم والعناصر العلوية)
+   ========================================================================== */
+.main {
+  flex: 1;
+  padding: 30px;
+  overflow-y: auto;
+}
+
+.topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 20px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+#date {
+  font-size: 22px;
+  font-weight: 600;
+  color: #38bdf8;
+  letter-spacing: 1px;
+  text-shadow: 0 2px 8px rgba(0,0,0,0.5);
+}
+
+/* ==========================================================================
+   5. GLASS CARDS (كروت عرض البيانات الشفافة)
+   ========================================================================== */
+.cards {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px;
+  margin-top: 30px;
+}
+
+.card {
+  background: rgba(30, 41, 59, 0.45);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 20px;
+  padding: 24px;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.2);
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.card:hover {
+  transform: translateY(-6px);
+  background: rgba(30, 41, 59, 0.65);
+  border-color: rgba(96, 165, 250, 0.3);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.35);
+}
+
+.card h3 {
+  color: #94a3b8;
+  font-size: 16px;
+  font-weight: 500;
+  margin: 0 0 10px 0;
+}
+
+.card p {
+  color: #ffffff;
+  font-size: 28px;
+  font-weight: 700;
+  margin: 0;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+}
+
+/* ==========================================================================
+   6. FORMS & INPUTS (المدخلات وعناصر النوافذ الفرعية العامة)
+   ========================================================================== */
+.page {
+  padding: 80px 40px 40px 40px; 
+  height: calc(100vh - 120px);
+  overflow-y: auto;
+}
+
+.box {
+  margin-bottom: 20px;
+}
+
+.box label {
+  display: block;
+  margin-bottom: 8px;
+  color: #94a3b8;
+  font-weight: 500;
+}
+
+input {
+  padding: 12px 16px;
+  width: 320px;
+  background: rgba(15, 23, 42, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: white;
+  border-radius: 10px;
+  outline: none;
+  font-size: 15px;
+  transition: all 0.3s;
+  position: relative;
+  z-index: 10;
+  pointer-events: auto;
+}
+
+input:focus {
+  border-color: #3b82f6;
+  background: rgba(15, 23, 42, 0.8);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.25);
+}
+
+.item, .box-item, .invoice-item {
+  background: rgba(30, 41, 59, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  padding: 14px 20px;
+  margin: 10px 0;
+  border-radius: 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+.item:hover, .box-item:hover, .invoice-item:hover {
+  transform: scale(1.015);
+  background: rgba(30, 41, 59, 0.6);
+  border-color: rgba(255,255,255,0.1);
+}
+
+.total {
+  margin: 25px 0;
+  font-size: 22px;
+  font-weight: 600;
+  color: #38bdf8;
+}
+
+.total span {
+  font-size: 28px;
+  color: white;
+  font-weight: 700;
+}
+
+/* ==========================================================================
+   7. BUTTONS SYSTEM (نظام الأزرار المتفاعل العام)
+   ========================================================================== */
+.new-btn {
+  margin-top: 40px;
+  padding: 16px 36px;
+  font-size: 18px;
+  font-weight: 600;
+  border: none;
+  background: linear-gradient(135deg, #1d4ed8, #3b82f6);
+  color: white;
+  border-radius: 14px;
+  cursor: pointer;
+  box-shadow: 0 8px 20px rgba(29, 78, 216, 0.3);
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+.new-btn:hover {
+  transform: scale(1.05) translateY(-2px);
+  box-shadow: 0 12px 25px rgba(29, 78, 216, 0.45);
+  filter: brightness(1.1);
+}
+
+.save-btn {
+  margin-top: 20px;
+  padding: 14px 28px;
+  background: linear-gradient(135deg, #16a34a, #22c55e);
+  border: none;
+  color: white;
+  font-size: 16px;
+  font-weight: 600;
+  border-radius: 12px;
+  cursor: pointer;
+  box-shadow: 0 6px 15px rgba(22, 163, 74, 0.25);
+  transition: all 0.3s;
+}
+
+.save-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 20px rgba(22, 163, 74, 0.4);
+  filter: brightness(1.1);
+}
+
+.box-item button, .invoice-item button {
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.2);
+  color: #ef4444;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: all 0.2s;
+}
+
+.box-item button:hover, .invoice-item button:hover {
+  background: #ef4444;
+  color: white;
+  transform: scale(1.1);
+}
+
+/* ==========================================================================
+   8. GLOBAL HEADER & NAVIGATION (الرأس الثابت العلوي للملاحة)
+   ========================================================================== */
+.global-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 65px;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  padding: 0 25px;
+  background: rgba(17, 24, 39, 0.55);
+  backdrop-filter: blur(15px);
+  -webkit-backdrop-filter: blur(15px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  z-index: 1000;
+}
+
+.global-header h1 {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 600;
+}
+
+.back-btn {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: white;
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  cursor: pointer;
+  font-size: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+.back-btn:hover {
+  transform: translateX(4px); 
+  background: rgba(255, 255, 255, 0.15);
+  border-color: rgba(255, 255, 255, 0.25);
+}
+
+.back-btn:active {
+  transform: scale(0.92) translateX(2px);
+}
+
+/* ==========================================================================
+   10. NEW INVOICE PAGE UPGRADE (تطوير تصميم شاشة الفواتير الجديد)
+   ========================================================================== */
+.invoice-container {
+  max-width: 1000px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 25px;
+  padding-bottom: 40px;
+}
+
+.invoice-section {
+  background: rgba(30, 41, 59, 0.4);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 18px;
+  padding: 25px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+}
+
+.invoice-section h2 {
+margin: 0 0 20px 0;
+  font-size: 20px;
+  color: #60a5fa;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  padding-bottom: 10px;
+}
+
+/* ==========================================================================
+   15. CUSTOMER INPUTS GAP CONFIG (تنسيق وفصل بيانات الزبون)
+   ========================================================================== */
+.inputs-grid {
+  display: flex;
+  gap: 30px;
+  flex-wrap: wrap;
+  width: 100%;
+}
+
+.inputs-grid .box {
+  flex: 1;
+  min-width: 280px;
+  max-width: 450px;
+}
+
+.inputs-grid input {
+  width: 100% !important;
+  box-sizing: border-box;
+}
+
+.invoice-items-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+@media (max-width: 768px) {
+  .invoice-items-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.items-list-container {
+  max-height: 250px;
+  overflow-y: auto;
+  padding-right: 5px;
+}
+
+.items-list-container::-webkit-scrollbar {
+  width: 6px;
+}
+
+.items-list-container::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+}
+
+.invoice-container .item {
+  background: rgba(15, 23, 42, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  margin: 8px 0;
+  padding: 12px 18px;
+  border-radius: 10px;
+}
+
+.invoice-container .item input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+  accent-color: #3b82f6;
+}
+
+.invoice-footer-section {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: rgba(17, 24, 39, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 20px 30px;
+  border-radius: 18px;
+}
+
+.total-box {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.total-label {
+  font-size: 18px;
+  color: #94a3b8;
+}
+
+.total-amount {
+  font-size: 32px;
+  font-weight: 800;
+  color: #38bdf8;
+  text-shadow: 0 0 10px rgba(56, 189, 248, 0.2);
+}
+
+.action-save-btn {
+  padding: 16px 40px;
+  font-size: 18px;
+  font-weight: 600;
+  border: none;
+  background: linear-gradient(135deg, #16a34a, #22c55e);
+  color: white;
+  border-radius: 14px;
+  cursor: pointer;
+  box-shadow: 0 8px 20px rgba(22, 163, 74, 0.3);
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+.action-save-btn:hover {
+  transform: translateY(-3px) scale(1.02);
+  box-shadow: 0 12px 25px rgba(22, 163, 74, 0.45);
+  filter: brightness(1.1);
+}
+
+.action-save-btn:active {
+  transform: translateY(1px);
+}
+
+/* ==========================================================================
+   11. REPORTS & ANIMATIONS (مكتبة الحركات والتقارير المدمجة)
+   ========================================================================== */
+.reports .card {
+  background: rgba(30, 41, 59, 0.4);
+  padding: 18px 25px;
+  margin: 12px 0;
+  border-radius: 14px;
+  font-size: 18px;
+}
+
+.reports .card span {
+  font-weight: 700;
+  color: #34d399;
+}
+/* ==========================================================================
+   12. HISTORY PAGE UPGRADE (تطوير تصميم سجل الفواتير والكروت)
+   ========================================================================== */
+.history-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding-bottom: 40px;
+}
+
+.history-container h1 {
+  font-size: 24px;
+  color: #60a5fa;
+  margin-bottom: 25px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  padding-bottom: 12px;
+}
+
+.invoices-grid-layout {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 20px;
+  margin-top: 10px;
+}
+
+.history-container .invoice-item {
+  background: rgba(30, 41, 59, 0.45);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 16px;
+  padding: 20px;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+.history-container .invoice-item:hover {
+  transform: translateY(-5px);
+  background: rgba(30, 41, 59, 0.65);
+  border-color: rgba(96, 165, 250, 0.3);
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.25);
+}
+
+.history-container .invoice-item h3 {
+  margin: 0;
+  font-size: 19px;
+  color: #ffffff;
+  font-weight: 600;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  padding-bottom: 6px;
+  max-width: 85%;
+}
+
+.history-container .invoice-item p {
+  margin: 4px 0 0 0;
+  font-size: 14px;
+  color: #94a3b8;
+}
+
+.history-container .invoice-item p:last-of-type {
+  margin-top: auto;
+  font-size: 22px;
+  font-weight: 700;
+  color: #34d399;
+  text-align: left;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  padding-top: 8px;
+}
+
+.history-container .invoice-item p:last-of-type::after {
+  content: " جنيه";
+  font-size: 14px;
+  font-weight: 500;
+  color: #a7f3d0;
+}
+
+.history-container .invoice-item button {
+  position: absolute;
+  top: 15px;
+  left: 15px;
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.2);
+  color: #ef4444;
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  transition: all 0.2s;
+}
+
+.history-container .invoice-item button:hover {
+  background: #ef4444;
+  color: white;
+  transform: scale(1.1);
+  box-shadow: 0 0 10px rgba(239, 68, 68, 0.4);
+}
+
+/* ==========================================================================
+   13. SETTINGS & REPORTS UPGRADE (تطوير تصميم الإعدادات والتقارير الموحد)
+   ========================================================================== */
+.settings-container, .reports-container {
+  max-width: 1000px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 25px;
+  padding-bottom: 40px;
+}
+
+.reports-container h1 {
+  font-size: 24px;
+  color: #60a5fa;
+  margin-bottom: 10px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  padding-bottom: 12px;
+}
+
+.settings-section {
+  background: rgba(30, 41, 59, 0.4);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 18px;
+  padding: 25px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+}
+
+.settings-section h2 {
+  margin: 0 0 20px 0;
+  font-size: 20px;
+  color: #60a5fa;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  padding-bottom: 10px;
+}
+
+.settings-inputs-group {
+  display: flex;
+  gap: 15px;
+  flex-wrap: wrap;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.settings-inputs-group input {
+  max-width: 250px;
+}
+
+.settings button {
+  padding: 12px 24px !important;
+  font-size: 15px !important;
+  font-weight: 600 !important;
+  border: 1px solid rgba(59, 130, 246, 0.3) !important;
+  background: linear-gradient(135deg, #1e4ed8, #3b82f6) !important;
+  color: white !important;
+  border-radius: 10px !important;
+  cursor: pointer !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  box-shadow: 0 4px 15px rgba(59, 130, 246, 0.2) !important;
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1) !important;
+  margin-top: 5px !important;
+}
+
+.settings button:hover {
+  transform: translateY(-2px) scale(1.03) !important;
+  background: linear-gradient(135deg, #1d4ed8, #60a5fa) !important;
+  border-color: rgba(96, 165, 250, 0.5) !important;
+  box-shadow: 0 8px 25px rgba(59, 130, 246, 0.4) !important;
+  filter: brightness(1.1) !important;
+}
+
+.settings button:active {
+  transform: translateY(1px) scale(0.98) !important;
+  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.2) !important;
+}
+
+.settings-list-box {
+  max-height: 200px;
+  overflow-y: auto;
+  margin-top: 15px;
+  padding-left: 5px;
+}
+
+.settings-list-box::-webkit-scrollbar {
+  width: 5px;
+}
+
+.settings-list-box::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+}
+
+.reports-grid-layout {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+  margin-top: 15px;
+}
+
+@media (max-width: 600px) {
+  .reports-grid-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+.reports-card {
+  background: rgba(30, 41, 59, 0.45);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 20px;
+  padding: 30px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+.reports-card:hover {
+  transform: translateY(-5px);
+  background: rgba(30, 41, 59, 0.65);
+  border-color: rgba(96, 165, 250, 0.3);
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.25);
+}
+
+.reports-card h3 {
+  color: #94a3b8;
+  font-size: 16px;
+  font-weight: 500;
+  margin: 0 0 12px 0;
+}
+
+.reports-card p {
+  font-size: 32px;
+  font-weight: 800;
+  margin: 0;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+.card-today p, .card-all p {
+  color: #34d399;
+}
+
+.card-week p, .card-month p {
+  color: #38bdf8;
+}
+
+.invoice input, .settings input {
+  position: relative !important;
+  z-index: 9999 !important;
+  pointer-events: auto !important;
+}
+/* ==========================================================================
+   16. PROFESSIONAL SETTINGS BUTTONS UPGRADE (تطوير أزرار إضافة الخدمات والمنتجات)
+   ========================================================================== */
+.add-btn {
+  padding: 10px 20px !important;
+  font-size: 15px !important;
+  font-weight: 600 !important;
+  border: 1px solid rgba(59, 130, 246, 0.4) !important;
+  background: linear-gradient(135deg, #1e4ed8, #3b82f6) !important;
+  color: white !important;
+  border-radius: 10px !important;
+  cursor: pointer !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 8px !important;
+  direction: rtl !important;
+  box-shadow: 0 4px 15px rgba(59, 130, 246, 0.2) !important;
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1) !important;
+  margin-top: 5px !important;
+  white-space: nowrap !important;
+}
+
+.add-btn:hover {
+  transform: translateY(-2px) scale(1.02) !important;
+  background: linear-gradient(135deg, #1d4ed8, #60a5fa) !important;
+  border-color: rgba(96, 165, 250, 0.6) !important;
+  box-shadow: 0 8px 25px rgba(59, 130, 246, 0.4) !important;
+  filter: brightness(1.1) !important;
+}
+
+.add-btn:active {
+  transform: translateY(1px) scale(0.98) !important;
+  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.2) !important;
+}
+
+.settings-inputs-group input, .settings input {
+  margin-bottom: 12px !important;
+  display: inline-block !important;
+  vertical-align: middle !important;
+}
+
+/* ==========================================================================
+   17. BARBER SELECT DROPDOWN STYLE (تنسيق قائمة اختيار الحلاق الزجاجية)
+   ========================================================================== */
+.barber-select {
+  padding: 12px 16px !important;
+  width: 100% !important;
+  max-width: 320px !important;
+  background: rgba(15, 23, 42, 0.6) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  color: white !important;
+  border-radius: 10px !important;
+  outline: none !important;
+  font-size: 15px !important;
+  cursor: pointer !important;
+  font-weight: 500 !important;
+  transition: all 0.3s !important;
+}
+
+.barber-select:focus {
+  border-color: #3b82f6 !important;
+  background: rgba(15, 23, 42, 0.8) !important;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.25) !important;
+}
+
+.barber-select option {
+  background: #1e293b !important;
+  color: white !important;
+  padding: 10px !important;
+}
+
+/* مكتبة الأنيميشن والحركات العامة التابعة للملف بالكامل */
+@keyframes fadeInScale { 
+  from { transform: scale(0.85); opacity: 0; } 
+  to { transform: scale(1); opacity: 1; } 
+}
+
+@keyframes floatApp { 
+  0%, 100% { transform: translateY(0); } 
+  50% { transform: translateY(-10px); } 
+}
+
+@keyframes scissorsCut { 
+  0%, 100% { transform: rotate(0deg); } 
+  50% { transform: rotate(-20deg) scale(1.05); } 
+}
+
+@keyframes glowEffect { 
+  from { text-shadow: 0 0 10px rgba(96,165,250,0.5), 0 0 20px rgba(96,165,250,0.2); } 
+  to { text-shadow: 0 0 20px rgba(96,165,250,0.9), 0 0 40px rgba(96,165,250,0.5); } 
+}
+
+@keyframes pageEnterActive { 
+  from { opacity: 0; transform: translateY(12px) scale(0.99); } 
+  to { opacity: 1; transform: translateY(0) scale(1); } 
+}
+
+/* ==========================================================================
+   🎯 ستايل الدائرة المتوهجة الفخمة للقسم النشط في السايدبار
+   ========================================================================== */
+.sidebar button {
+  position: relative;
+  overflow: hidden;
+}
+
+/* الكلاس الذكي اللي هينور جنب القسم المفتوح حالياً */
+.sidebar button.active-page-glow {
+  color: #ffffff !important;
+  border-color: rgba(59, 130, 246, 0.5) !important;
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.15), rgba(6, 182, 212, 0.05)) !important;
+  box-shadow: inset 0 0 10px rgba(59, 130, 246, 0.15);
+}
+
+/* رسم الدائرة النيون الصغيرة المتوهجة في الطرف الأيسر من الزرار */
+.sidebar button.active-page-glow::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 15px; 
+  transform: translateY(-50%);
+  width: 10px;
+  height: 10px;
+  background: #3b82f6;
+  border-radius: 50%;
+  box-shadow: 0 0 10px #3b82f6, 0 0 20px #3b82f6; /* توهج LED فخم */
+  animation: pulseGlow 1.5s infinite alternate;
+}
+
+@keyframes pulseGlow {
+  from { opacity: 0.6; transform: translateY(-50%) scale(0.9); }
+  to { opacity: 1; transform: translateY(-50%) scale(1.2); }
+}
+
+
+/* ==========================================================================
+   📱 PREMIUM MOBILE RESPONSIVE & PORTFOLIO GLOW (سيستم الفخامة للتلفون)
+   ========================================================================== */
+@media screen and (max-width: 768px) {
+  /* 1. ضبط التوزيع الرئيسي للشاشة ومنع التمدد العشوائي */
+  .app {
+    flex-direction: column !important;
+    height: 100vh !important;
+    overflow-x: hidden !important;
+    background: #030712 !important; /* تثبيت الخلفية الدارك الفخمة */
+  }
+
+  /* 2. تحويل السايدبار لشريط سفلي فخم ومثبت (Bottom Navigation Bar) */
+  .sidebar {
+    position: fixed !important;
+    bottom: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    width: 100% !important;
+    height: 70px !important;
+    flex-direction: row !important;
+    justify-content: space-around !important;
+    align-items: center !important;
+    padding: 0 10px !important;
+    background: rgba(15, 23, 42, 0.85) !important; /* زجاجي غامق */
+    backdrop-filter: blur(20px) !important;
+    -webkit-backdrop-filter: blur(20px) !important;
+    border-right: none !important;
+    border-top: 1px solid rgba(255, 255, 255, 0.08) !important;
+    z-index: 999999 !important;
+    border-radius: 24px 24px 0 0 !important; /* انحناء علوي شيك جداً */
+    box-shadow: 0 -10px 35px rgba(0, 0, 0, 0.6) !important;
+    box-sizing: border-box !important;
+  }
+
+  /* إخفاء اللوجو الكبير في التلفون لزيادة مساحة الرؤية */
+  .sidebar h2 {
+    display: none !important;
+  }
+
+  /* تحويل الأزرار لأيقونات مدمجة وسلسة للمس بالإصبع */
+  .sidebar button {
+    padding: 10px !important;
+    margin: 0 !important;
+    font-size: 12px !important;
+    width: auto !important;
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    flex-direction: column !important;
+    gap: 4px !important;
+    color: #94a3b8 !important;
+    transition: all 0.2s ease-in-out !important;
+  }
+
+  /* تأثير التوهج النيون الناعم للزرار النشط في التلفون */
+  .sidebar button.active-page-glow {
+    color: #60a5fa !important;
+    text-shadow: 0 0 10px rgba(96, 165, 250, 0.5) !important;
+    background: rgba(96, 165, 250, 0.08) !important;
+    border-radius: 12px !important;
+  }
+  
+  .sidebar button::after {
+    display: none !important; /* إلغاء التوهج الكبير القديم */
+  }
+
+  /* 3. ضبط المحتوى الرئيسي وتأمين مساحة للشريط السفلي */
+  .main {
+    padding: 20px 12px 95px 12px !important; /* مساحة حماية سفلية 95px لمنع تداخل الكروت */
+    width: 100% !important;
+    box-sizing: border-box !important;
+    overflow-y: auto !important;
+  }
+
+  /* 4. عمل Scale متناسق للـ Topbar والعناوين */
+  .topbar {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 6px !important;
+    margin-bottom: 20px !important;
+  }
+
+  .topbar h1 {
+    font-size: 22px !important;
+    font-weight: 800 !important;
+  }
+
+  /* 5. ترصيص الكروت والشبكات أفقياً (عنصرين جنب بعض بدلاً من 1fr العمودية) */
+  .cards, 
+  .reports-grid-layout, 
+  .invoices-grid-layout,
+  .inputs-grid,
+  .invoice-items-grid,
+  .items-grid {
+    display: grid !important;
+    grid-template-columns: repeat(2, 1fr) !important; /* ترصيص أفقي عنصرين بالسطر */
+    gap: 10px !important;
+    width: 100% !important;
+  }
+
+  .card, .reports-card, .invoice-item {
+    padding: 14px 12px !important;
+    border-radius: 16px !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+
+  .card h3, .reports-card h3 {
+    font-size: 12px !important;
+    white-space: nowrap !important;
+  }
+
+  .card p, .reports-card p {
+    font-size: 18px !important;
+  }
+
+  /* 6. ضبط أزرار العمليات الكبيرة لتكون جنب بعضها أفقياً */
+  .dashboard-actions {
+    display: flex !important;
+    flex-direction: row !important;
+    gap: 8px !important;
+    width: 100% !important;
+  }
+
+  .new-btn {
+    flex: 1 !important; /* الأزرار تتقاسم السطر بالتساوي */
+    width: auto !important; 
+    justify-content: center !important;
+    padding: 12px 8px !important;
+    font-size: 13px !important;
+    margin: 5px 0 !important;
+    border-radius: 12px !important;
+    white-space: nowrap !important;
+  }
+
+  /* 7. صناديق الإدخال والجداول المفرودة بحجم أفقي متناسق */
+  .invoice-container {
+    padding: 12px !important;
+    border-radius: 16px !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+
+  input, select, textarea {
+    font-size: 13px !important;
+    padding: 10px !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+    border-radius: 10px !important;
+    margin-top: 4px !important;
+  }
+
+  label {
+    font-size: 12px !important;
+  }
+}

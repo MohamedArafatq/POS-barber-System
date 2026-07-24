@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+  
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>سـجل الـفواتيـر</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+  <div class="bg-overlay"></div> <!-- طبقة التعتيم والبلور الفخمة -->
+  <div class="app">
+    
+    <!-- القائمة الجانبية المستقرة والموحدة -->
+    <div class="sidebar">
+        <h2>Elktheeb Casher</h2>
+        <button onclick="goTo('index.html')">🏠 لوحة التحكم</button>
+        <button onclick="goTo('invoice.html')">➕ فاتورة جديدة</button>
+        <button onclick="goTo('history.html')">📜 سجل الفواتير</button>
+        <button onclick="goTo('reports.html')">📊 التقارير</button>
+        <button onclick="goTo('days.html')">📅 سجل الأيام</button>
+        <button onclick="goTo('expenses.html')">💸 المصاريف اليومية</button>
+        <button onclick="goTo('settings.html')">⚙️ الإعدادات</button>
+    </div>
+
+    <!-- المحتوى الرئيسي للملف المنظم هندسياً جنب السايدبار -->
+    <div class="main">
+      <div class="topbar">
+        <button class="back-btn" onclick="goTo('index.html')">⬅</button>
+        <h1>سـجـل الـفـوات...يـر</h1>
+        <p id="date"></p>
+      </div>
+
+      <div class="invoice-container" style="max-width: 1200px;">
+        <!-- 💡 كروت فرز فواتير الكاش والتحويل العلوية النظيفة بالاسمين اللي أنت طالبهم بالملي -->
+        <div class="invoice-section" style="display: flex; flex-direction: column; gap: 20px; background: rgba(30, 41, 59, 0.4); border: 1px solid rgba(255,255,255,0.06); padding: 25px; border-radius: 18px;">
+          <h2 style="font-size: 24px; color: #60a5fa; border: none; padding: 0; margin: 0;">📜 جـمـيـع الـفـواتـيـر الـمـسـجـلـة بالوردية</h2>
+          
+          <div style="display: flex; gap: 15px; width: 100%; direction: rtl;">
+            <!-- عداد الكاش الأصفر -->
+            <div style="flex: 1; background: rgba(245, 158, 11, 0.08); border: 1px solid rgba(245, 158, 11, 0.2); padding: 14px 20px; border-radius: 14px; display: flex; justify-content: space-between; align-items: center;">
+              <span style="font-size: 16px; color: #cbd5e1; font-weight: 600;">💵 عدد فواتير الكاش:</span>
+              <span id="historyCashCount" style="font-size: 22px; font-weight: 800; color: #f59e0b; text-shadow: 0 0 10px rgba(245, 158, 11, 0.2);">0</span>
+            </div>
+            
+            <!-- ball عداد التحويل البنفسجي -->
+            <div style="flex: 1; background: rgba(167, 139, 250, 0.08); border: 1px solid rgba(167, 139, 250, 0.2); padding: 14px 20px; border-radius: 14px; display: flex; justify-content: space-between; align-items: center;">
+              <span style="font-size: 16px; color: #cbd5e1; font-weight: 600;">📱 عدد فواتير التحويل:</span>
+              <span id="historyElecCount" style="font-size: 22px; font-weight: 800; color: #a78bfa; text-shadow: 0 0 10px rgba(167, 139, 250, 0.2);">0</span>
+            </div>
+          </div>
+        </div>
+        
+        <!-- حاوية شبكة الفواتير المحسنة اللي بتنزل فيها الفواتير تلقائي بدون تعديل شكلها -->
+        <div id="invoicesBox" class="invoices-grid-layout" style="margin-top: 25px;"></div>
+      </div>
+    </div>
+
+  </div>
+
+  <script defer src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>فاتورة جديدة - الخطيب</title>
+    <link rel="stylesheet" href="style.css">
+    
+</head>
+<body>
+    <div class="bg-overlay"></div> <!-- سطر تعتيم الخلفية البروفيشينال -->
+    <div class="app">
+        <!-- القائمة الجانبية المودرن -->
+               <!-- 💡 القائمة الجانبية الموحدة والمثبتة هندسياً لمنع نزول الأزرار -->
+        <div class="sidebar">
+            <h2>Elktheeb Casher</h2>
+            <button onclick="goTo('index.html')">🏠 لوحة التحكم</button>
+            <button onclick="goTo('invoice.html')">➕ فاتورة جديدة</button>
+            <button onclick="goTo('history.html')">📜 سجل الفواتير</button>
+            <button onclick="goTo('reports.html')">📊 التقارير</button>
+            <button onclick="goTo('days.html')">📅 سجل الأيام</button>
+            <button onclick="goTo('expenses.html')">💸 المصاريف اليومية</button>
+            <button onclick="goTo('settings.html')">⚙️ الإعدادات</button>
+        </div>
+
+
+        <!-- المحتوى الرئيسي المنظم هندسياً -->
+        <div class="main">
+            <div class="topbar">
+                <h1 style="font-size: 26px; font-weight: 800; color: #60a5fa;">➕ تسجيل فاتورة جديدة</h1>
+                <p id="date"></p>
+            </div>
+
+            <div class="invoice-container">
+                <!-- كارت بيانات الزبون المنظم في صف واحد شيك -->
+                <div class="invoice-section">
+                    <h2>👤 بيانات الزبون والدفع</h2>
+                    <div class="inputs-grid">
+                        <div class="box">
+                            <label>اسم العميل</label>
+                            <input type="text" id="customerName" placeholder="اكتب اسم الزبون هنا">
+                        </div>
+                        <div class="box">
+                            <label>رقم الهاتف (اختياري)</label>
+                            <input type="text" id="customerPhone" placeholder="اكتب رقم الهاتف">
+                        </div>
+                        <div class="box">
+                            <label>عدد زبائن الفاتورة</label>
+                            <input type="number" id="customerCountInput" value="1" min="1">
+                        </div>
+                    </div>
+                    
+                    <div class="inputs-grid" style="margin-top: 20px;">
+                        <div class="box">
+                            <label>الحلاق المسؤول</label>
+                            <select id="barberName" class="barber-select">
+                                <option value="عام">حلاق عام / المحل</option>
+                                <option value="محمود">محمود</option>
+                                <option value="محمد">محمد</option>
+                                <option value="عرفه">عرفه</option>
+                            </select>
+                        </div>
+                        <div class="box">
+                            <label>طريقة الدفع</label>
+                            <select id="paymentMethod" class="barber-select">
+                                <option value="كاش">💵 كاش (في الدرج)</option>
+                                <option value="الكتروني">📱 تحويل /إنـستا باي- فودافون كاش</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- قسم الخدمات والمنتجات مصفوفة جنب بعض بانتظام -->
+                <div class="invoice-items-grid">
+                    <div class="invoice-section">
+                        <h2>✂️ الخدمات المتاحة</h2>
+                        <div id="servicesList" class="items-list-container"></div>
+                    </div>
+                    
+                    <div class="invoice-section">
+                        <h2>🧴 المنتجات والبيع</h2>
+                        <div id="productsList" class="items-list-container"></div>
+                        
+                        <div class="box" style="margin-top: 20px;">
+                            <label>💵 مبلغ يدوي إضافي</label>
+                            <input type="number" id="customPrice" placeholder="0 جنيه" oninput="updateTotal()" style="width: 100% !important;">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- الفوتر النهائي الفخم الحاسم للأموال -->
+                <div class="invoice-footer-section">
+                    <div class="total-box">
+                        <span class="total-label">الحساب الإجمالي:</span>
+                        <span class="total-amount"><span id="total">0</span> جنيه</span>
+                    </div>
+                    <button class="action-save-btn" onclick="saveInvoice()">💾 حفظ الفاتورة الحين</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script defer src="script.js"></script>
+</body>
+</html>
