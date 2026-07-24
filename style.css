@@ -1,4 +1,3 @@
-
 /* ==========================================================================
    1. INTRO SCREEN (الشاشة الترحيبية المحسنة)
    ========================================================================== */
@@ -132,7 +131,6 @@ body {
 .sidebar button:active {
   transform: scale(0.98) translateX(-2px);
 }
-
 
 /* ==========================================================================
    4. DASHBOARD & TOPBAR (لوحة التحكم والعناصر العلوية)
@@ -409,7 +407,7 @@ input:focus {
 }
 
 .invoice-section h2 {
-margin: 0 0 20px 0;
+  margin: 0 0 20px 0;
   font-size: 20px;
   color: #60a5fa;
   border-bottom: 1px solid rgba(255, 255, 255, 0.08);
@@ -545,6 +543,7 @@ margin: 0 0 20px 0;
   font-weight: 700;
   color: #34d399;
 }
+
 /* ==========================================================================
    12. HISTORY PAGE UPGRADE (تطوير تصميم سجل الفواتير والكروت)
    ========================================================================== */
@@ -803,6 +802,7 @@ margin: 0 0 20px 0;
   z-index: 9999 !important;
   pointer-events: auto !important;
 }
+
 /* ==========================================================================
    16. PROFESSIONAL SETTINGS BUTTONS UPGRADE (تطوير أزرار إضافة الخدمات والمنتجات)
    ========================================================================== */
@@ -1026,7 +1026,7 @@ margin: 0 0 20px 0;
     font-weight: 800 !important;
   }
 
-  /* 5. ترصيص الكروت والشبكات أفقياً (عنصرين جنب بعض بدلاً من 1fr العمودية) */
+  /* 5. ترصيص الكروت والشبكات أفقياً وضمان عدم التمدد للخارج */
   .cards, 
   .reports-grid-layout, 
   .invoices-grid-layout,
@@ -1034,12 +1034,15 @@ margin: 0 0 20px 0;
   .invoice-items-grid,
   .items-grid {
     display: grid !important;
-    grid-template-columns: repeat(2, 1fr) !important; /* ترصيص أفقي عنصرين بالسطر */
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important; /* يمنع انحراف وتمدد العناصر للخارج */
     gap: 10px !important;
     width: 100% !important;
+    box-sizing: border-box !important;
   }
 
-  .card, .reports-card, .invoice-item {
+  .card, .reports-card, .invoice-item, .invoice-container, .box {
+    max-width: 100% !important;
+    overflow: hidden !important; /* يمنع أي عنصر من الخروج عن حدود البوكس */
     padding: 14px 12px !important;
     border-radius: 16px !important;
     width: 100% !important;
@@ -1055,7 +1058,38 @@ margin: 0 0 20px 0;
     font-size: 18px !important;
   }
 
-  /* 6. ضبط أزرار العمليات الكبيرة لتكون جنب بعضها أفقياً */
+  /* 6. تكبير خط عناوين الحقول (Labels) لتكون واضحة جداً للمستخدم */
+  label {
+    font-size: 14px !important;
+    font-weight: 700 !important;
+    color: #e2e8f0 !important;
+    margin-bottom: 4px !important;
+    display: block !important;
+  }
+
+  /* 7. تكبير خطوط وحجم الكتابة داخل الحقول والقوائم المنسدلة للوضوح المباشر */
+  input[type="text"],
+  input[type="number"],
+  input[type="tel"],
+  input[type="password"],
+  input[type="date"],
+  select,
+  textarea,
+  .barber-select {
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important; /* يمنع الـ Input من اعتماد عرض أدنى عشوائي */
+    box-sizing: border-box !important;
+    height: 42px !important; /* ارتفاع مريح للحقل */
+    padding: 8px 10px !important;
+    font-size: 15px !important; /* خط واضح ومقروء */
+    font-weight: 600 !important;
+    color: #ffffff !important;
+    border-radius: 10px !important;
+    margin-top: 4px !important;
+  }
+
+  /* 8. ضبط أزرار العمليات الكبيرة لتكون جنب بعضها أفقياً */
   .dashboard-actions {
     display: flex !important;
     flex-direction: row !important;
@@ -1064,7 +1098,7 @@ margin: 0 0 20px 0;
   }
 
   .new-btn {
-    flex: 1 !important; /* الأزرار تتقاسم السطر بالتساوي */
+    flex: 1 !important;
     width: auto !important; 
     justify-content: center !important;
     padding: 12px 8px !important;
@@ -1073,25 +1107,80 @@ margin: 0 0 20px 0;
     border-radius: 12px !important;
     white-space: nowrap !important;
   }
+}
+/* ==========================================================================
+   📱 تكبير الشريط السفلي والأزرار لملء المساحة الفارغة بالكامل
+   ========================================================================== */
+@media screen and (max-width: 768px) {
 
-  /* 7. صناديق الإدخال والجداول المفرودة بحجم أفقي متناسق */
-  .invoice-container {
-    padding: 12px !important;
-    border-radius: 16px !important;
+  /* 1. تكبير البوكس الخارجي وتوسيعه لأعلى ليغطي الشاشة السفلى */
+  .sidebar {
+    position: fixed !important;
+    bottom: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
     width: 100% !important;
+    height: 120px !important; /* تكبير الارتفاع ليتمدد في الفراغ الأسود فوقه */
+    display: flex !important;
+    flex-direction: row !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    padding: 12px 8px !important; /* حواف داخلية متناسقة */
+    background: rgba(15, 23, 42, 0.98) !important;
+    backdrop-filter: blur(25px) !important;
+    -webkit-backdrop-filter: blur(25px) !important;
+    border-top: 2px solid rgba(255, 255, 255, 0.15) !important;
+    border-radius: 28px 28px 0 0 !important;
+    z-index: 999999 !important;
+    box-shadow: 0 -15px 40px rgba(0, 0, 0, 0.8) !important;
     box-sizing: border-box !important;
   }
 
-  input, select, textarea {
+  /* 2. جعل أزرار التحكم تكبر وتملأ كامل الارتفاع المتاح داخل البوكس */
+  .sidebar button {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    flex: 1 !important;
+    height: 100% !important; /* الأزرار ستتمدد لتملأ المساحة الكلية رأسيًا */
+    max-height: 96px !important; /* طول ممتاذ للزرار */
+    padding: 8px 4px !important;
+    margin: 0 3px !important;
     font-size: 13px !important;
-    padding: 10px !important;
-    width: 100% !important;
-    box-sizing: border-box !important;
-    border-radius: 10px !important;
-    margin-top: 4px !important;
+    font-weight: 700 !important;
+    line-height: 1.2 !important;
+    white-space: normal !important; /* للسماح بالنص الطويل بالتنسيق */
+    text-align: center !important;
+    background: rgba(255, 255, 255, 0.04) !important;
+    border: 1px solid rgba(255, 255, 255, 0.08) !important;
+    border-radius: 18px !important; /* انحناءات كبيرة وضخمة للأزرار */
+    color: #cbd5e1 !important;
+    gap: 6px !important;
+    transition: all 0.2s ease-in-out !important;
   }
 
-  label {
-    font-size: 12px !important;
+  /* تكبير الإيموجي/الأيقونة داخل الزرار */
+  .sidebar button i, 
+  .sidebar button span {
+    font-size: 24px !important; /* أيقونة ضخمة وواضحة */
+  }
+
+  /* تمييز الزرار النشط بتوهج فخم */
+  .sidebar button.active-page-glow {
+    color: #ffffff !important;
+    background: linear-gradient(180deg, rgba(59, 130, 246, 0.35), rgba(30, 58, 138, 0.5)) !important;
+    border-color: rgba(96, 165, 250, 0.6) !important;
+    transform: translateY(-2px) !important;
+    box-shadow: 0 6px 20px rgba(59, 130, 246, 0.3) !important;
+  }
+
+  .sidebar button.active-page-glow::before {
+    display: none !important;
+  }
+
+  /* رفع محتوى الصفحة لعدم الاختفاء خلف البوكس بعد تكبيره */
+  .main {
+    padding-bottom: 135px !important;
   }
 }
