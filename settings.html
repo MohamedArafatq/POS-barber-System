@@ -37,16 +37,35 @@
 
             <!-- شبكة الإعدادات المنظمة في كروت جنب بعض -->
             <div class="invoice-container">
-            <!-- 💡 كارت قفل وتصفير الوردية اليدوي الفخم بديل التوقيت التلقائي بطلبك بالملي -->
-<div class="invoice-section" style="background: rgba(220, 38, 38, 0.05) !important; border: 1px solid rgba(220, 38, 38, 0.18) !important; padding: 25px !important; border-radius: 18px !important; margin-bottom: 25px !important;">
-    <h2 style="color: #ef4444 !important; border-bottom: 1px solid rgba(220, 38, 38, 0.15) !important; padding-bottom: 10px !important; margin-bottom: 15px !important; font-size: 22px !important; font-weight: bold !important;">🔒 إغلاق وتصفير الوردية الحالية يدوياً</h2>
-    <div style="display: flex !important; justify-content: space-between !important; align-items: center !important; flex-wrap: wrap !important; gap: 15px !important; direction: rtl !important;">
-        <p style="margin: 0 !important; color: #cbd5e1 !important; font-size: 15px !important; font-weight: 500 !important;">اضغط على هذا الزرار عند الانتهاء من العمل تماماً بالصالون لتصفير عدادات لوحة التحكم بره لبدء وردية جديدة، مع بقاء الفواتير القديمة محفوظة في سجل الأيام للأبد.</p>
-        <button class="save-btn" onclick="triggerManualShiftReset()" style="margin: 0 !important; padding: 14px 35px !important; background: linear-gradient(135deg, #dc2626, #b91c1c) !important; box-shadow: 0 4px 15px rgba(220,38,38,0.3) !important; font-weight: bold !important; border-radius: 12px !important; cursor: pointer !important; color: white !important; border: none !important; transition: all 0.2s !important;">
-            🔒 قفل وتصفير الوردية الحين
-        </button>
-    </div>
-</div>
+            <!-- 💡 سيستم التصفير المزدوج: زرار يدوي فوري + مؤقت تلقائي يومي جنبه بالظبط -->
+            <div class="invoice-items-grid" style="margin-bottom: 25px;">
+                <!-- كارت قفل وتصفير الوردية اليدوي الفخم -->
+                <div class="invoice-section" style="background: rgba(220, 38, 38, 0.05) !important; border: 1px solid rgba(220, 38, 38, 0.18) !important; padding: 25px !important; border-radius: 18px !important;">
+                    <h2 style="color: #ef4444 !important; border-bottom: 1px solid rgba(220, 38, 38, 0.15) !important; padding-bottom: 10px !important; margin-bottom: 15px !important; font-size: 22px !important; font-weight: bold !important;">🔒 إغلاق وتصفير الوردية الحالية يدوياً</h2>
+                    <div style="display: flex !important; flex-direction: column !important; justify-content: space-between !important; gap: 15px !important; direction: rtl !important;">
+                        <p style="margin: 0 !important; color: #cbd5e1 !important; font-size: 15px !important; font-weight: 500 !important;">اضغط على هذا الزرار عند الانتهاء من العمل تماماً بالصالون لتصفير عدادات لوحة التحكم بره لبدء وردية جديدة، مع بقاء الفواتير القديمة محفوظة في سجل الأيام للأبد.</p>
+                        <button class="save-btn" onclick="triggerManualShiftReset()" style="margin: 0 !important; padding: 14px 35px !important; background: linear-gradient(135deg, #dc2626, #b91c1c) !important; box-shadow: 0 4px 15px rgba(220,38,38,0.3) !important; font-weight: bold !important; border-radius: 12px !important; cursor: pointer !important; color: white !important; border: none !important; transition: all 0.2s !important; justify-content: center !important;">
+                            🔒 قفل وتصفير الوردية الحين
+                        </button>
+                    </div>
+                </div>
+
+                <!-- كارت التصفير التلقائي اليومي في ميعاد حر -->
+                <div class="invoice-section" style="background: rgba(59, 130, 246, 0.05) !important; border: 1px solid rgba(59, 130, 246, 0.18) !important; padding: 25px !important; border-radius: 18px !important;">
+                    <h2 style="color: #60a5fa !important; border-bottom: 1px solid rgba(59, 130, 246, 0.15) !important; padding-bottom: 10px !important; margin-bottom: 15px !important; font-size: 22px !important; font-weight: bold !important;">⏰ التصفير التلقائي اليومي للوردية</h2>
+                    <div style="display: flex !important; flex-direction: column !important; justify-content: space-between !important; gap: 15px !important; direction: rtl !important;">
+                        <p style="margin: 0 !important; color: #cbd5e1 !important; font-size: 15px !important; font-weight: 500 !important;">حدد ميعاد قفل الوردية وهو هيصفر عدادات لوحة التحكم لوحده كل يوم في نفس الميعاد حتى لو نسيت تضغط الزرار، وبرضه من غير ما يمس أرشيف الأيام القديم.</p>
+                        <div class="box" style="margin: 0;">
+                            <label>ميعاد التصفير التلقائي</label>
+                            <input type="time" id="resetTimeInput" style="width: 100% !important;">
+                        </div>
+                        <button class="save-btn" onclick="saveResetTime()" style="margin: 0 !important; padding: 14px 35px !important; background: linear-gradient(135deg, #2563eb, #3b82f6) !important; box-shadow: 0 4px 15px rgba(37,99,235,0.3) !important; font-weight: bold !important; border-radius: 12px !important; cursor: pointer !important; color: white !important; border: none !important; transition: all 0.2s !important; justify-content: center !important;">
+                            💾 حفظ ميعاد التصفير التلقائي
+                        </button>
+                        <p id="nextAutoResetInfo" style="margin: 0 !important; color: #94a3b8 !important; font-size: 14px !important;"></p>
+                    </div>
+                </div>
+            </div>
 
 
                 <!-- كروت إضافة الخدمات والمنتجات مصفوفة بالجنب -->

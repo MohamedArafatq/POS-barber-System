@@ -7,8 +7,18 @@ function getInvoices() {
   return JSON.parse(localStorage.getItem("invoices")) || [];
 }
 
+const DEFAULT_SHIFT_RESET_TIME = "04:00";
+const SHIFT_RESET_TIME_KEY = "shiftResetTime";
+const MANUAL_RESET_KEY = "lastManualResetTime";
+const AUTO_RESET_KEY = "lastAutoResetTime";
+const SHIFT_WATCHER_INTERVAL_MS = 15000;
+
 function getResetTime() {
-  return localStorage.getItem("shiftResetTime") || "00:00";
+  const stored = localStorage.getItem(SHIFT_RESET_TIME_KEY);
+  if (!stored || !/^\d{1,2}:\d{2}$/.test(stored)) return DEFAULT_SHIFT_RESET_TIME;
+  const [hour, minute] = stored.split(":").map(Number);
+  if (hour > 23 || minute > 59) return DEFAULT_SHIFT_RESET_TIME;
+  return `${String(hour).padStart(2, "0")}:${String(minute).padStart(2, "0")}`;
 }
 
 /* =======================
@@ -17,6 +27,7 @@ function getResetTime() {
 document.addEventListener("DOMContentLoaded", () => {
   try {
     setDate();
+    startShiftResetWatcher();
 
     if (document.getElementById("todayTotal")) loadDashboard();
     if (document.getElementById("servicesList")) loadItems();
@@ -133,48 +144,127 @@ function saveInvoice() {
 function getShiftDateString(dateStr) {
   const date = new Date(dateStr);
   if (isNaN(date)) return "";
-  
-  // جلب وقت تصفير المحل المعتمد (الساعة 4 الفجر)
-  const resetStr = localStorage.getItem("shiftResetTime") || "04:00";
-  const [rHour, rMinute] = resetStr.split(":").map(Number);
+
+  // جلب وقت تصفير المحل المعتمد (الساعة 4 الفجر افتراضياً)
+  const [rHour, rMinute] = getResetTime().split(":").map(Number);
 
   const offsetMS = (rHour * 60 + rMinute) * 60 * 1000;
   const shiftDate = new Date(date.getTime() - offsetMS);
-  
+
   // إرجاع التاريخ بصيغة أرقام صافية (YYYY-MM-DD) عشان يطابق الأرشيف بنجاح وبدون نصوص لخبطة
   const year = shiftDate.getFullYear();
   const month = String(shiftDate.getMonth() + 1).padStart(2, '0');
   const day = String(shiftDate.getDate()).padStart(2, '0');
-  
+
   return `${year}-${month}-${day}`;
 }
 
-function isInvoiceInCurrentShift(invoiceDateStr) {
-  if (!invoiceDateStr) return false;
-  const invDate = new Date(invoiceDateStr);
+// آخر ميعاد تصفير تلقائي عدى (النهاردة الساعة كذا أو امبارح لو الميعاد لسه ماجاش)
+function getScheduledShiftStart(now = new Date()) {
+  const [rHour, rMinute] = getResetTime().split(":").map(Number);
+  const start = new Date(now);
+  start.setHours(rHour, rMinute, 0, 0);
+  if (start > now) start.setDate(start.getDate() - 1);
+  return start;
+}
+
+// ميعاد التصفير التلقائي الجاي
+function getNextScheduledShiftReset(now = new Date()) {
+  const next = new Date(getScheduledShiftStart(now));
+  next.setDate(next.getDate() + 1);
+  return next;
+}
+
+// بداية الوردية الحالية = الأحدث بين التصفير التلقائي والتصفير اليدوي
+function getCurrentShiftStart(now = new Date()) {
+  let start = getScheduledShiftStart(now);
+
+  [MANUAL_RESET_KEY, AUTO_RESET_KEY].forEach(key => {
+    const stored = localStorage.getItem(key);
+    if (!stored) return;
+    const storedDate = new Date(stored);
+    if (!isNaN(storedDate) && storedDate > start && storedDate <= now) start = storedDate;
+  });
+
+  return start;
+}
+
+function isInvoiceInCurrentShift(dateInput) {
+  if (!dateInput) return false;
+  const invDate = new Date(dateInput);
+  if (isNaN(invDate)) return false;
+
+  // الفاتورة تخص الوردية المفتوحة لو اتعملت بعد آخر تصفير (يدوي كان أو تلقائي)
+  return invDate >= getCurrentShiftStart();
+}
+
+/* ==========================================================================
+   ⏰ DUAL SHIFT RESET (تصفير يدوي بالزرار + تصفير تلقائي في ميعاد محدد يومياً)
+   ========================================================================== */
+let observedShiftStart = null;
+let shiftWatcherId = null;
+
+// تصفير عدادات الوردية والحالات المؤقتة في الشاشات بدون المساس بالسجلات القديمة
+function clearActiveShiftState() {
+  localStorage.removeItem("filterDayInvoices");
+
+  document.querySelectorAll(".item input[type='checkbox']").forEach(cb => { cb.checked = false; });
+  const customPrice = document.getElementById("customPrice");
+  if (customPrice) customPrice.value = "";
+  total = 0;
+  setText("total", 0);
+
+  refreshShiftViews();
+}
+
+function refreshShiftViews() {
+  if (document.getElementById("todayTotal")) loadDashboard();
+  if (document.getElementById("invoicesBox")) loadHistory();
+  if (document.getElementById("expensesLogBox")) loadExpensesLog();
+  if (document.getElementById("today")) loadReports();
+  if (document.getElementById("daysGridLayout")) loadPreviousDays();
+  if (document.getElementById("privacyBtn")) applyPrivacyStyle();
+  if (document.getElementById("nextAutoResetInfo")) loadResetTimeSetting();
+}
+
+// نقطة التصفير الموحدة: اليدوي والتلقائي بيشتغلوا بنفس المنطق بالظبط
+function performShiftReset(mode) {
   const now = new Date();
-  
-  const resetStr = localStorage.getItem("shiftResetTime") || "04:00";
-  const [rHour, rMinute] = resetStr.split(":").map(Number);
+  const stamp = mode === "manual" ? now : getScheduledShiftStart(now);
 
-  // حساب نقطة بداية الوردية الحالية بالملي
-  const currentShiftStart = new Date(now);
-  currentShiftStart.setHours(rHour, rMinute, 0, 0);
+  localStorage.setItem(mode === "manual" ? MANUAL_RESET_KEY : AUTO_RESET_KEY, stamp.toISOString());
+  observedShiftStart = getCurrentShiftStart().getTime();
+  clearActiveShiftState();
+}
 
-  if (now.getHours() < rHour || (now.getHours() === rHour && now.getMinutes() < rMinute)) {
-    currentShiftStart.setDate(currentShiftStart.getServerDate ? currentShiftStart.getServerDate() - 1 : currentShiftStart.getDate() - 1);
+// الحارس الخلفي: بيقارن بداية الوردية كل شوية وينفذ التصفير أول ما الميعاد يعدي
+function checkAutomaticShiftReset() {
+  const currentStart = getCurrentShiftStart().getTime();
+  if (observedShiftStart === null) {
+    observedShiftStart = currentStart;
+    return;
   }
+  if (currentStart === observedShiftStart) return;
 
-  // 💡 السطر الحاسر: الفاتورة تظهر لو اتعملت بعد بداية وردية اليوم (يوم 17)، وأي حاجة قبلها (يوم 16) تختفي فوراً
-  return invDate >= currentShiftStart;
+  observedShiftStart = currentStart;
+  performShiftReset("auto");
+
+  if (typeof showPremiumAlert === "function") {
+    showPremiumAlert("تم تصفير الوردية تلقائياً ⏰", `بدأت وردية جديدة في ميعاد ${getResetTime()} وكل السجلات القديمة محفوظة في سجل الأيام.`);
+  }
+}
+
+function startShiftResetWatcher() {
+  observedShiftStart = getCurrentShiftStart().getTime();
+  if (shiftWatcherId) clearInterval(shiftWatcherId);
+  shiftWatcherId = setInterval(checkAutomaticShiftReset, SHIFT_WATCHER_INTERVAL_MS);
 }
 
 // تصدير وتأمين الدوال للويندوز والإلكترون
 window.getShiftDateString = getShiftDateString;
 window.isInvoiceInCurrentShift = isInvoiceInCurrentShift;
-
-
-
+window.getCurrentShiftStart = getCurrentShiftStart;
+window.getNextScheduledShiftReset = getNextScheduledShiftReset;
 
 
 
@@ -214,33 +304,210 @@ function deleteQuickExpense(i) {
 /* =======================
    DAYS ARCHIVE SYSTEM
 ======================= */
+const expandedMonths = new Set();
+
+// تجميع كل الفواتير المحفوظة على مستوى الورديات (اليوم الواحد)
+function buildDayStats() {
+  const stats = {};
+
+  getInvoices().forEach(inv => {
+    const dateKey = getShiftDateString(inv.date);
+    if (!dateKey) return;
+    if (!stats[dateKey]) stats[dateKey] = { revenue: 0, invoices: 0, customers: 0 };
+
+    let cCount = Number(inv.customerCount);
+    if (isNaN(cCount) || cCount <= 0) cCount = 1;
+
+    stats[dateKey].revenue += Number(inv.total) || 0;
+    stats[dateKey].invoices += 1;
+    stats[dateKey].customers += cCount;
+  });
+
+  return stats;
+}
+
+function getMonthKey(dateKey) {
+  return (dateKey || "").slice(0, 7);
+}
+
+function getMonthLabel(monthKey) {
+  const [year, month] = monthKey.split("-").map(Number);
+  const label = new Date(year, month - 1, 1).toLocaleDateString("ar-EG", { month: "long", year: "numeric" });
+  return label;
+}
+
+// تجميع أرقام الشهر كله (الدخل، متوسط الأسبوع، الفواتير، الزبائن)
+function buildMonthSummary(monthKey, dayKeys, dayStats) {
+  const summary = { revenue: 0, invoices: 0, customers: 0, days: dayKeys.length, weeklyAverage: 0 };
+
+  dayKeys.forEach(dateKey => {
+    const day = dayStats[dateKey];
+    summary.revenue += day.revenue;
+    summary.invoices += day.invoices;
+    summary.customers += day.customers;
+  });
+
+  const [year, month] = monthKey.split("-").map(Number);
+  const daysInMonth = new Date(year, month, 0).getDate();
+  const weeksInMonth = daysInMonth / 7;
+  summary.weeklyAverage = Math.round(summary.revenue / weeksInMonth);
+
+  return summary;
+}
+
+function buildDayCard(dateKey, day) {
+  const card = document.createElement("div");
+  card.className = "invoice-item day-archive-card";
+  card.style.cursor = "pointer";
+  card.style.flexDirection = "column";
+  card.style.alignItems = "stretch";
+  card.onclick = () => showDayDetails(dateKey);
+
+  card.innerHTML = `
+    <h3 style="max-width: 100%;">📅 وردية يوم: ${dateKey}</h3>
+    <p style="margin: 6px 0 0 0; font-size: 14px; color: #94a3b8;">🧾 ${day.invoices} فاتورة • 👥 ${day.customers} زبون</p>
+    <p style="margin-top: auto; font-size: 20px; font-weight: 700; color: #38bdf8; text-align: left;">
+      ${day.revenue} جنيه
+    </p>
+  `;
+  return card;
+}
+
+function buildMonthArchiveCard(monthKey, summary) {
+  const card = document.createElement("div");
+  card.className = "invoice-item month-archive-card";
+  card.dataset.month = monthKey;
+  card.onclick = () => toggleMonthArchive(monthKey);
+
+  card.innerHTML = `
+    <h3 style="max-width: 100%;">🗄️ أرشيف شهر: ${getMonthLabel(monthKey)}</h3>
+    <p style="margin: 6px 0 0 0; font-size: 14px; color: #94a3b8;">📅 ${summary.days} وردية مقفولة • 🧾 ${summary.invoices} فاتورة</p>
+    <p style="margin-top: auto; font-size: 20px; font-weight: 700; color: #a78bfa; text-align: left;">
+      ${summary.revenue} جنيه
+      <span class="month-archive-arrow" style="float: right; font-size: 16px; color: #60a5fa;">▼</span>
+    </p>
+  `;
+  return card;
+}
+
+function buildMonthSummaryPanel(summary) {
+  return `
+    <div class="invoice-section" style="margin-bottom: 18px; background: rgba(96, 165, 250, 0.06); border-color: rgba(96, 165, 250, 0.2);">
+      <h2 style="font-size: 18px;">📈 ملخص أداء الشهر بالكامل</h2>
+      <div class="reports-grid-layout">
+        <div class="reports-card card-today">
+          <h3>إجمالي دخل الشهر</h3>
+          <p style="color: #38bdf8;">${summary.revenue} جنيه</p>
+        </div>
+        <div class="reports-card card-week">
+          <h3>متوسط الدخل الأسبوعي</h3>
+          <p style="color: #34d399;">${summary.weeklyAverage} جنيه</p>
+        </div>
+        <div class="reports-card card-week">
+          <h3>عدد الفواتير</h3>
+          <p style="color: #f59e0b;">${summary.invoices}</p>
+        </div>
+        <div class="reports-card card-week">
+          <h3>عدد الزبائن</h3>
+          <p style="color: #a78bfa;">${summary.customers}</p>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function buildMonthArchivePanel(monthKey, dayKeys, dayStats, summary) {
+  const panel = document.createElement("div");
+  panel.className = "month-archive-panel";
+  panel.id = `monthPanel-${monthKey}`;
+
+  const inner = document.createElement("div");
+  inner.className = "month-archive-inner";
+  inner.innerHTML = buildMonthSummaryPanel(summary);
+
+  const daysGrid = document.createElement("div");
+  daysGrid.className = "invoices-grid-layout";
+  dayKeys.forEach(dateKey => daysGrid.appendChild(buildDayCard(dateKey, dayStats[dateKey])));
+  inner.appendChild(daysGrid);
+
+  panel.appendChild(inner);
+  return panel;
+}
+
+// فتح وقفل كارت الشهر بسلاسة مع إظهار أيامه وملخصه جوه الشبكة
+function toggleMonthArchive(monthKey) {
+  const panel = document.getElementById(`monthPanel-${monthKey}`);
+  const card = document.querySelector(`.month-archive-card[data-month="${monthKey}"]`);
+  if (!panel) return;
+
+  if (expandedMonths.has(monthKey)) {
+    expandedMonths.delete(monthKey);
+    panel.style.maxHeight = `${panel.scrollHeight}px`;
+    requestAnimationFrame(() => {
+      panel.classList.remove("open");
+      panel.style.maxHeight = "0px";
+    });
+  } else {
+    expandedMonths.add(monthKey);
+    panel.classList.add("open");
+    panel.style.maxHeight = `${panel.scrollHeight}px`;
+  }
+
+  if (card) card.classList.toggle("open", expandedMonths.has(monthKey));
+}
+
+// فك قفل الارتفاع بعد انتهاء الحركة عشان الكروت متتقصش لو الشاشة اتغيرت
+document.addEventListener("transitionend", e => {
+  const panel = e.target;
+  if (!panel.classList || !panel.classList.contains("month-archive-panel")) return;
+  if (panel.classList.contains("open")) panel.style.maxHeight = "none";
+});
+
 function loadPreviousDays() {
   const grid = document.getElementById("daysGridLayout");
   if (!grid) return;
 
-  const invoices = getInvoices();
   grid.innerHTML = "";
 
-  let dayGroups = {};
-  invoices.forEach(inv => {
-    const shiftDateKey = getShiftDateString(inv.date);
-    if (!dayGroups[shiftDateKey]) dayGroups[shiftDateKey] = 0;
-    dayGroups[shiftDateKey] += inv.total;
+  const dayStats = buildDayStats();
+  const dayKeys = Object.keys(dayStats).sort().reverse();
+
+  if (!dayKeys.length) {
+    grid.innerHTML = `<div class="invoice-section" style="grid-column: 1 / -1; text-align: center; color: #94a3b8;">لا توجد ورديات محفوظة في الأرشيف حتى الآن.</div>`;
+    return;
+  }
+
+  // تقسيم الأيام على الشهور، والشهر الحالي بيفضل مفرود يوم بيوم
+  const months = {};
+  dayKeys.forEach(dateKey => {
+    const monthKey = getMonthKey(dateKey);
+    if (!months[monthKey]) months[monthKey] = [];
+    months[monthKey].push(dateKey);
   });
 
-  Object.keys(dayGroups).forEach(dateKey => {
-    const card = document.createElement("div");
-    card.className = "invoice-item";
-    card.style.cursor = "pointer";
-    card.onclick = () => showDayDetails(dateKey);
+  const currentMonthKey = getMonthKey(getShiftDateString(new Date().toISOString()));
 
-    card.innerHTML = `
-      <h3 style="max-width: 100%;">📅 وردية يوم: ${dateKey}</h3>
-      <p style="margin-top: auto; font-size: 20px; font-weight: 700; color: #38bdf8; text-align: left;">
-        ${dayGroups[dateKey]} جنيه
-      </p>
-    `;
-    grid.appendChild(card);
+  Object.keys(months).sort().reverse().forEach(monthKey => {
+    const monthDays = months[monthKey];
+
+    if (monthKey === currentMonthKey) {
+      monthDays.forEach(dateKey => grid.appendChild(buildDayCard(dateKey, dayStats[dateKey])));
+      return;
+    }
+
+    // 💡 الشهر اللي خلص بيتلم كله في كارت واحد بيتفتح بالضغط عليه
+    const summary = buildMonthSummary(monthKey, monthDays, dayStats);
+    grid.appendChild(buildMonthArchiveCard(monthKey, summary));
+
+    const panel = buildMonthArchivePanel(monthKey, monthDays, dayStats, summary);
+    grid.appendChild(panel);
+
+    if (expandedMonths.has(monthKey)) {
+      panel.classList.add("open");
+      panel.style.maxHeight = "none";
+      const card = grid.querySelector(`.month-archive-card[data-month="${monthKey}"]`);
+      if (card) card.classList.add("open");
+    }
   });
 }
 
@@ -279,7 +546,7 @@ function showDayDetails(dateKey) {
     };
   }
 
-  document.getElementById("detailsTitle").innerText = `📊 تفاصيل وردية يوم: ${dateKey}`;
+  setText("detailsTitle", `📊 تفاصيل وردية يوم: ${dateKey}`);
   setText("dTotal", total + " جنيه");
   setText("dExpenses", dayExp + " جنيه");
   setText("dProfit", (total - dayExp) + " جنيه");
@@ -289,20 +556,64 @@ function showDayDetails(dateKey) {
   setText("dMohamed", mohamed + " جنيه");
   setText("dArafa", arafa + " جنيه");
 
+  // 💡 حقن سجل فواتير نفس اليوم بالتصميم الكلاسيكي أسفل قسم التفاصيل
+  renderDayInvoicesLog(dateKey);
+
   // 💡 السطر السحري والقاضي: إخفاء شبكة الأيام العلوية والكارت الترحيبي تماماً لتنظيف الشاشة
-  const daysGrid = document.getElementById("daysGridLayout");
-  if (daysGrid) {
-    daysGrid.style.display = "none";
-  }
-  
-  // إخفاء كارت العناوين الصغير المكتوب فيه "اختر اليوم لعرض تفاصيل الوردية" لزيادة النظافة البصرية
-  const introCard = daysGrid?.previousElementSibling;
-  if (introCard && introCard.classList.contains("invoice-section")) {
-    introCard.style.display = "none";
-  }
+  toggleDaysArchiveView(false);
 
   section.style.display = "block";
   section.scrollIntoView({ behavior: "smooth" });
+}
+
+// إظهار أو إخفاء شبكة الأيام مع الكارت الترحيبي بتاعها مرة واحدة
+function toggleDaysArchiveView(visible) {
+  const daysGrid = document.getElementById("daysGridLayout");
+  if (daysGrid) daysGrid.style.display = visible ? "grid" : "none";
+
+  const introCard = daysGrid ? daysGrid.previousElementSibling : null;
+  if (introCard && introCard.classList.contains("invoice-section")) {
+    introCard.style.display = visible ? "block" : "none";
+  }
+}
+
+// سجل فواتير الوردية القديمة بنفس شكل صفحة السجل الأصلي بالظبط
+function renderDayInvoicesLog(dateKey) {
+  const box = document.getElementById("dayInvoicesLogBox");
+  if (!box) return;
+
+  box.innerHTML = "";
+  const dayInvoices = getInvoices().filter(inv => getShiftDateString(inv.date) === dateKey);
+
+  const counterEl = document.getElementById("dayInvoicesCount");
+  if (counterEl) counterEl.innerText = dayInvoices.length;
+
+  if (!dayInvoices.length) {
+    box.innerHTML = `<div class="invoice-section" style="grid-column: 1 / -1; text-align: center; color: #94a3b8;">لا توجد فواتير مسجلة في هذه الوردية.</div>`;
+    return;
+  }
+
+  dayInvoices.forEach(inv => {
+    const div = document.createElement("div");
+    div.className = "invoice-item";
+
+    // نفس التنسيق الكلاسيكي المستخدم في سجل الفواتير عشان الشكل ميختلفش
+    div.setAttribute("style", "background: rgba(30, 41, 59, 0.45) !important; backdrop-filter: blur(10px) !important; -webkit-backdrop-filter: blur(10px) !important; border: 1px solid rgba(255, 255, 255, 0.08) !important; border-radius: 16px !important; padding: 20px !important; position: relative !important; display: flex !important; flex-direction: column !important; gap: 8px !important; box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15) !important; width: 100% !important; box-sizing: border-box !important; min-height: auto !important; height: auto !important; text-align: right !important; direction: rtl !important;");
+
+    const invTime = inv.date ? new Date(inv.date).toLocaleTimeString("ar-EG", { hour: '2-digit', minute: '2-digit' }) : "";
+    const payText = inv.payment === "الكتروني" ? "📱 تحويل" : "💵 كاش";
+    const currentInvCount = inv.customerCount || 1;
+
+    div.innerHTML = `
+      <h3 style="margin: 0 0 10px 0 !important; font-size: 19px !important; color: #ffffff !important; font-weight: 600 !important; border-bottom: 1px solid rgba(255, 255, 255, 0.05) !important; padding-bottom: 6px !important; width: 85% !important; display: block !important;">${inv.name}</h3>
+      <p style="margin: 0 !important; padding: 0 !important; font-size: 14px !important; color: #94a3b8 !important; display: block !important;">👥 عدد زبائن الفاتورة: <strong style="color: #38bdf8 !important;">${currentInvCount}</strong></p>
+      <p style="margin: 4px 0 0 0 !important; padding: 0 !important; font-size: 14px !important; color: #94a3b8 !important; display: block !important;">💈 الحلاق: <strong style="color: #60a5fa !important;">${inv.barber || "عام"}</strong></p>
+      <p style="margin: 4px 0 0 0 !important; padding: 0 !important; font-size: 14px !important; color: #94a3b8 !important; display: block !important;">💳 طريقة الدفع: <strong style="color: #f59e0b !important;">${payText}</strong></p>
+      <p style="margin: 4px 0 0 0 !important; padding: 0 !important; font-size: 14px !important; color: #94a3b8 !important; display: block !important;">⏰ وقت التحرير: <strong>${invTime}</strong></p>
+      <p style="margin-top: 8px !important; font-size: 22px !important; font-weight: 700 !important; color: #34d399 !important; border-top: 1px solid rgba(255, 255, 255, 0.05) !important; padding-top: 8px !important; width: 100% !important; display: block !important;">${inv.total} <span style="font-size: 14px !important; font-weight: 500 !important; color: #a7f3d0 !important;">جنيه</span></p>
+    `;
+    box.appendChild(div);
+  });
 }
 
 
@@ -413,16 +724,23 @@ function loadDashboard() {
 
 function saveResetTime() {
   const input = document.getElementById("resetTimeInput");
-  if (input && input.value) {
-    localStorage.setItem("shiftResetTime", input.value);
-    alert("تم حفظ توقيت تصفير الوردية الحر بنجاح ⏰"); 
-    window.location.reload();
-  }
+  if (!input || !input.value) return alert("⚠️ أرجوك اختار ميعاد التصفير التلقائي الأول");
+
+  localStorage.setItem(SHIFT_RESET_TIME_KEY, input.value);
+  observedShiftStart = getCurrentShiftStart().getTime();
+  alert("تم حفظ توقيت تصفير الوردية التلقائي بنجاح ⏰");
+  window.location.reload();
 }
 
 function loadResetTimeSetting() {
   const input = document.getElementById("resetTimeInput");
   if (input) input.value = getResetTime();
+
+  const info = document.getElementById("nextAutoResetInfo");
+  if (info) {
+    const next = getNextScheduledShiftReset();
+    info.innerText = `🔄 التصفير التلقائي الجاي: ${next.toLocaleDateString("ar-EG", { weekday: "long", day: "numeric", month: "long" })} الساعة ${getResetTime()}`;
+  }
 }
 
 function addService() {
@@ -662,12 +980,11 @@ window.deleteQuickExpense = deleteQuickExpense;
    ========================================================================== */
 function handleBackAction() {
   const detailsSection = document.getElementById("dayDetailsSection");
-  const daysGrid = document.getElementById("daysGridLayout");
 
   // لو قسم تفاصيل اليوم مفتوح وظاهر قدام عينك
   if (detailsSection && detailsSection.style.display === "block") {
     detailsSection.style.display = "none"; // إخفاء التفاصيل فوراً
-    if (daysGrid) daysGrid.style.display = "grid"; // إعادة إظهار كروت الأيام كاملة ونظيفة
+    toggleDaysArchiveView(true); // إعادة إظهار كروت الأيام والشهور كاملة ونظيفة
     window.scrollTo({ top: 0, behavior: "smooth" }); // رفع الشاشة لفوق بسلاسة
   } 
   // لو أنت أصلاً واقف في سجل الأيام بره ومفيش تفاصيل مفتوحة
@@ -783,51 +1100,14 @@ function triggerManualShiftReset() {
   }
 
   // لو داس "موافق" (Ok) يتم التصفير الفعلي للوردية بالملي وحفظ التاريخ في جهازك
-  const now = new Date();
-  localStorage.setItem("lastManualResetTime", now.toISOString());
-  
+  performShiftReset("manual");
+
   alert("🎉 تم قفل الوردية السابقة وتصفير العدادات بنجاح! بدأ عد الوردية الجديدة الحين طيران. 🚀");
   window.location.reload();
 }
 
-// 💡 تحديث دالة فحص الوردية لقراءة التصفير اليدوي بدلاً من الوقت التلقائي العشوائي
-function isInvoiceInCurrentShift(dateInput) {
-  if (!dateInput) return false;
-  const invDate = new Date(dateInput);
-  const lastResetStr = localStorage.getItem("lastManualResetTime");
-  
-  if (!lastResetStr) {
-    const todayStr = new Date().toISOString().split("T")[0];
-    const invDateStr = invDate.toISOString().split("T")[0];
-    return invDateStr === todayStr;
-  }
-  
-  const lastReset = new Date(lastResetStr);
-  return invDate > lastReset; // الفاتورة تظهر بره وجوه السجل لو اتعملت بعد تاريخ آخر ضغطة زرار بالملي
-}
-
 // تصدير وإتاحة الدوال الجديدة للإلكترون
 window.triggerManualShiftReset = triggerManualShiftReset;
-window.isInvoiceInCurrentShift = isInvoiceInCurrentShift;
-
-
-// 💡 تحديث دالة فحص الوردية لقراءة التصفير اليدوي بدلاً من الوقت التلقائي العشوائي
-function isInvoiceInCurrentShift(dateInput) {
-  if (!dateInput) return false;
-  const invDate = new Date(dateInput);
-  const lastResetStr = localStorage.getItem("lastManualResetTime");
-  
-  if (!lastResetStr) {
-    // لو لسه أول مرة والزرار متداش، اعتبر فواتير اليوم الحالي شغال عادي
-    const todayStr = new Date().toISOString().split("T")[0];
-    const invDateStr = invDate.toISOString().split("T")[0];
-    return invDateStr === todayStr;
-  }
-  
-  const lastReset = new Date(lastResetStr);
-  return invDate > lastReset; // الفاتورة تظهر بره وجوه السجل لو اتعملت بعد تاريخ آخر ضغطة زرار بالملي
-}
-
-// تصدير وإتاحة الدوال الجديدة للإلكترون
-window.triggerManualShiftReset = triggerManualShiftReset;
-window.isInvoiceInCurrentShift = isInvoiceInCurrentShift;
+window.performShiftReset = performShiftReset;
+window.toggleMonthArchive = toggleMonthArchive;
+window.showDayDetails = showDayDetails;

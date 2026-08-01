@@ -7,6 +7,43 @@
   <title>الأيام السابقة</title>
   <link rel="stylesheet" href="style.css">
 
+  <style>
+    /* كارت الشهر المضغوط اللي بيلم أيام الشهر اللي خلص */
+    .month-archive-card {
+      flex-direction: column;
+      align-items: stretch;
+      cursor: pointer;
+      background: rgba(139, 92, 246, 0.08);
+      border-color: rgba(167, 139, 250, 0.25);
+    }
+
+    .month-archive-card .month-archive-arrow {
+      display: inline-block;
+      transition: transform 0.3s ease;
+    }
+
+    .month-archive-card.open .month-archive-arrow {
+      transform: rotate(180deg);
+    }
+
+    /* لوحة الشهر المفتوحة بتاخد عرض الشبكة كامل وبتفتح بسلاسة */
+    .month-archive-panel {
+      grid-column: 1 / -1;
+      max-height: 0;
+      overflow: hidden;
+      opacity: 0;
+      transition: max-height 0.45s cubic-bezier(0.25, 0.8, 0.25, 1), opacity 0.3s ease;
+    }
+
+    .month-archive-panel.open {
+      opacity: 1;
+    }
+
+    .month-archive-inner {
+      padding: 10px 4px 4px 4px;
+    }
+  </style>
+
 </head>
 
 <body>
@@ -81,6 +118,10 @@
                   👁️ عرض فواتير هذه الوردية بالكامل
               </button>
           </div>
+
+          <!-- 🧾 سجل فواتير نفس الوردية بالتصميم الكلاسيكي أسفل التفاصيل -->
+          <h3 style="margin-top: 30px; color: #60a5fa; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 8px;">🧾 فواتير هذه الوردية (<span id="dayInvoicesCount">0</span>):</h3>
+          <div id="dayInvoicesLogBox" class="invoices-grid-layout"></div>
 
         </div>
       </div>
