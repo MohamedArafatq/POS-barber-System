@@ -459,6 +459,7 @@ function toggleMonthArchive(monthKey) {
 // فك قفل الارتفاع بعد انتهاء الحركة عشان الكروت متتقصش لو الشاشة اتغيرت
 document.addEventListener("transitionend", e => {
   const panel = e.target;
+  if (e.propertyName !== "max-height") return;
   if (!panel.classList || !panel.classList.contains("month-archive-panel")) return;
   if (panel.classList.contains("open")) panel.style.maxHeight = "none";
 });
